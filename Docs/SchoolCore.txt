@@ -1,0 +1,212 @@
+Roles
+
+RoleID (INT, PK, IDENTITY, N)
+RoleName (NVARCHAR(50), UNIQUE, N)
+Description: Defines user roles (e.g., Admin, Teacher, Student, Parent).
+
+
+Users
+
+UserID (INT, PK, IDENTITY, N)
+Username (NVARCHAR(50), UNIQUE, N)
+PasswordHash (NVARCHAR(256), N)
+Email (NVARCHAR(100), UNIQUE, N)
+FullName (NVARCHAR(100), Y)
+Phone (NVARCHAR(20), Y)
+RoleID (INT, FK to Roles.RoleID, N)
+CreatedAt (DATETIME, DEFAULT GETDATE(), N)
+UpdatedAt (DATETIME, Y)
+IsActive (BIT, DEFAULT 1, N)
+Description: Stores user accounts for all roles.
+
+
+Classes
+
+ClassID (INT, PK, IDENTITY, N)
+ClassName (NVARCHAR(50), Y)
+Description: Represents grade levels (e.g., Grade 1).
+
+
+Sections
+
+SectionID (INT, PK, IDENTITY, N)
+SectionName (NVARCHAR(10), Y)
+ClassID (INT, FK to Classes.ClassID, N)
+Description: Divisions within a class (e.g., Section A).
+
+
+Subjects
+
+SubjectID (INT, PK, IDENTITY, N)
+SubjectName (NVARCHAR(100), Y)
+Description (NVARCHAR(MAX), Y)
+Description: Subjects taught in the school.
+
+
+Curriculum
+
+CurriculumID (INT, PK, IDENTITY, N)
+SubjectID (INT, FK to Subjects.SubjectID, N)
+ClassID (INT, FK to Classes.ClassID, N)
+Syllabus (NVARCHAR(MAX), Y)
+Year (INT, Y)
+Description: Syllabus for a subject in a class for a specific year.
+
+
+Students
+
+StudentID (INT, PK, IDENTITY, N)
+UserID (INT, FK to Users.UserID, UNIQUE, N)
+ClassID (INT, FK to Classes.ClassID, N)
+SectionID (INT, FK to Sections.SectionID, N)
+EnrollmentDate (DATE, Y)
+ParentUserID (INT, FK to Users.UserID, Y)
+Address (NVARCHAR(200), Y)
+DOB (DATE, Y)
+CreatedAt (DATETIME, DEFAULT GETDATE(), N)
+UpdatedAt (DATETIME, Y)
+IsActive (BIT, DEFAULT 1, N)
+Description: Student profiles, linked to user accounts and parents.
+
+
+EnrollmentHistory
+
+EnrollmentHistoryID (INT, PK, IDENTITY, N)
+StudentID (INT, FK to Students.StudentID, N)
+ClassID (INT, FK to Classes.ClassID, N)
+SectionID (INT, FK to Sections.SectionID, N)
+EnrollmentDate (DATE, Y)
+Status (NVARCHAR(20), Y)
+Description: Tracks changes in student enrollment.
+
+
+Attendance
+
+AttendanceID (INT, PK, IDENTITY, N)
+StudentID (INT, FK to Students.StudentID, N)
+Date (DATE, N)
+Status (NVARCHAR(20), Y)
+Remarks (NVARCHAR(200), Y)
+Description: Daily attendance records for students.
+
+
+Teachers
+
+TeacherID (INT, PK, IDENTITY, N)
+UserID (INT, FK to Users.UserID, UNIQUE, N)
+Qualification (NVARCHAR(100), Y)
+ExperienceYears (INT, Y)
+CreatedAt (DATETIME, DEFAULT GETDATE(), N)
+UpdatedAt (DATETIME, Y)
+IsActive (BIT, DEFAULT 1, N)
+Description: Teacher profiles, linked to user accounts.
+
+
+TeacherAssignments
+
+AssignmentID (INT, PK, IDENTITY, N)
+TeacherID (INT, FK to Teachers.TeacherID, N)
+SubjectID (INT, FK to Subjects.SubjectID, N)
+ClassID (INT, FK to Classes.ClassID, N)
+SectionID (INT, FK to Sections.SectionID, N)
+AcademicYear (INT, Y)
+Description: Assigns teachers to subjects, classes, and sections.
+
+
+Exams
+
+ExamID (INT, PK, IDENTITY, N)
+ExamName (NVARCHAR(100), Y)
+SubjectID (INT, FK to Subjects.SubjectID, N)
+ClassID (INT, FK to Classes.ClassID, N)
+ExamDate (DATE, Y)
+MaxMarks (DECIMAL(5,2), Y)
+Description: Defines exams for a subject and class.
+
+
+Grades
+
+GradeID (INT, PK, IDENTITY, N)
+StudentID (INT, FK to Students.StudentID, N)
+ExamID (INT, FK to Exams.ExamID, N)
+MarksObtained (DECIMAL(5,2), Y)
+Grade (NVARCHAR(10), Y)
+Remarks (NVARCHAR(200), Y)
+Description: Stores student exam results.
+
+
+FeeStructures
+
+FeeID (INT, PK, IDENTITY, N)
+ClassID (INT, FK to Classes.ClassID, N)
+FeeType (NVARCHAR(50), Y)
+Amount (DECIMAL(10,2), Y)
+DueDate (DATE, Y)
+AcademicYear (INT, Y)
+Description: Defines fee structures for classes.
+
+
+Payments
+
+PaymentID (INT, PK, IDENTITY, N)
+StudentID (INT, FK to Students.StudentID, N)
+FeeID (INT, FK to FeeStructures.FeeID, N)
+PaymentDate (DATE, Y)
+AmountPaid (DECIMAL(10,2), Y)
+PaymentMethod (NVARCHAR(50), Y)
+ReceiptNumber (NVARCHAR(50), Y)
+Description: Records student fee payments.
+
+
+PaymentHistory
+
+HistoryID (INT, PK, IDENTITY, N)
+PaymentID (INT, FK to Payments.PaymentID, N)
+Status (NVARCHAR(20), Y)
+UpdatedAt (DATETIME, Y)
+Description: Tracks payment status changes.
+
+
+LibraryBooks
+
+BookID (INT, PK, IDENTITY, N)
+Title (NVARCHAR(200), Y)
+Author (NVARCHAR(100), Y)
+ISBN (NVARCHAR(20), UNIQUE, N)
+Quantity (INT, Y)
+Available (INT, Y)
+Description: Library book catalog.
+
+
+Borrowings
+
+BorrowingID (INT, PK, IDENTITY, N)
+BookID (INT, FK to LibraryBooks.BookID, N)
+UserID (INT, FK to Users.UserID, N)
+BorrowDate (DATE, Y)
+DueDate (DATE, Y)
+ReturnDate (DATE, Y)
+Fine (DECIMAL(10,2), Y)
+Description: Tracks book borrowings by users.
+
+
+Notices
+
+NoticeID (INT, PK, IDENTITY, N)
+Title (NVARCHAR(100), Y)
+Content (NVARCHAR(MAX), Y)
+PostedByUserID (INT, FK to Users.UserID, N)
+PostDate (DATETIME, DEFAULT GETDATE(), N)
+TargetRole (NVARCHAR(50), Y)
+Description: School-wide announcements.
+
+
+Messages
+
+MessageID (INT, PK, IDENTITY, N)
+FromUserID (INT, FK to Users.UserID, N)
+ToUserID (INT, FK to Users.UserID, N)
+Content (NVARCHAR(MAX), Y)
+SentDate (DATETIME, DEFAULT GETDATE(), N)
+IsRead (BIT, DEFAULT 0, N)
+Description: Private messages between users.
